@@ -4,22 +4,22 @@ from PIL import Image
 import webbrowser
 import urllib.parse
 
-# Page configuration with logo in title area
+# Page configuration with custom logo icon
 st.set_page_config(
     page_title="Catapult CSV Exporter",
-    page_icon="⚡",
+    page_icon="assets/catapult_logo.png",
     layout="wide"
 )
 
 # Load Catapult logo and display in sidebar
 def load_logo():
     try:
-        logo = Image.open('assets/catapult_logo.png')  # ensure this file exists
+        logo = Image.open('assets/catapult_logo.png')
         st.sidebar.image(logo, use_column_width=True)
     except Exception:
         st.sidebar.markdown("<h3>Catapult CSV Exporter</h3>", unsafe_allow_html=True)
 
-# Inject custom CSS to match Catapult styling
+# Inject custom CSS for Catapult styling and dark mode support
 def load_css():
     st.markdown("""
     <style>
@@ -29,6 +29,11 @@ def load_css():
       }
       .stApp {
         background-color: #F2F4F8;
+      }
+      .main-header img {
+        height: 1.5em;
+        vertical-align: middle;
+        margin-right: 0.5em;
       }
       .main-header {
         color: #005EB8;
@@ -86,7 +91,7 @@ def load_css():
         opacity: 0.85;
       }
       /* Dark mode overrides */
-      @media(prefers-color-scheme: dark) {
+      @media (prefers-color-scheme: dark) {
         .stApp {
           background-color: #0E1117 !important;
         }
@@ -107,7 +112,6 @@ def load_css():
     """, unsafe_allow_html=True)
 
 # Helper: split player IDs into chunks
-
 def split_player_ids(url, chunk_size=100):
     try:
         player_ids = url.split("playerIDs=")[1].split("&")[0].split("%2C")
@@ -128,8 +132,15 @@ def main():
     load_logo()
     load_css()
 
-    st.markdown('<h1 class="main-header">⚡ Catapult CSV Exporter</h1>', unsafe_allow_html=True)
-    st.markdown('<p class="sub-header">Export large datasets by automatically splitting URLs into manageable chunks</p>', unsafe_allow_html=True)
+    # Header with inline logo image
+    st.markdown(
+        '<h1 class="main-header"><img src="assets/catapult_logo.png" alt="Logo">Catapult CSV Exporter</h1>',
+        unsafe_allow_html=True
+    )
+    st.markdown(
+        '<p class="sub-header">Export large datasets by automatically splitting URLs into manageable chunks</p>',
+        unsafe_allow_html=True
+    )
 
     url_input = st.text_area(
         "🔗 Paste your Catapult export URL here:",
