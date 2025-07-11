@@ -72,28 +72,20 @@ def main():
                 # Show summary
                 st.info(f"📊 **Summary:** {total_athletes} athletes split into {len(urls)} chunks of up to {chunk_size} athletes each")
                 
-                # Download All button
+                # Download All section
                 st.subheader("🚀 Quick Actions")
-                col1, col2 = st.columns([1, 3])
                 
-                with col1:
-                    if st.button("📥 Download All CSVs", type="primary", help="Opens all URLs at once"):
-                        # Create JavaScript to open all URLs
-                        js_code = """
-                        <script>
-                        const urls = """ + str(urls).replace("'", '"') + """;
-                        urls.forEach((url, index) => {
-                            setTimeout(() => {
-                                window.open(url, '_blank');
-                            }, index * 500); // Stagger opening by 500ms to avoid browser blocking
-                        });
-                        </script>
-                        """
-                        st.components.v1.html(js_code, height=0)
-                        st.success(f"🎉 Opening all {len(urls)} URLs! Check for pop-ups if they don't open.")
+                # Create a grid of "Download All" links
+                st.markdown("**📥 Download All CSVs** (Click each link to open):")
                 
-                with col2:
-                    st.markdown("**💡 Tip:** The 'Download All' button opens all URLs at once with a small delay between each.")
+                # Create columns for the download all links
+                cols = st.columns(min(len(urls), 4))
+                for i, url in enumerate(urls):
+                    with cols[i % 4]:
+                        athletes_in_chunk = min(chunk_size, total_athletes - (i * chunk_size))
+                        st.markdown(f'<a href="{url}" target="_blank" style="display: inline-block; padding: 8px 12px; background-color: #ff4b4b; color: white; text-decoration: none; border-radius: 4px; font-size: 14px; margin: 2px; text-align: center; width: 100%;">📥 CSV {i+1}<br>({athletes_in_chunk} athletes)</a>', unsafe_allow_html=True)
+                
+                st.markdown("**💡 Tip:** Click each red button above to download the CSV files. They will open in new tabs.")
                 
                 # Display results in a more organized way
                 st.subheader("Individual URLs")
