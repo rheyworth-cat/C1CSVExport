@@ -1,3 +1,6 @@
+# To fix the logo not showing, Streamlit requires the image path passed to st.image to be a file or URL, not in markdown.
+# Let's adjust the header and icon loading code to use st.image instead of HTML <img>.
+
 import streamlit as st
 import streamlit.components.v1 as components
 from PIL import Image
@@ -7,7 +10,7 @@ import urllib.parse
 # Page configuration with custom logo icon
 st.set_page_config(
     page_title="Catapult CSV Exporter",
-    page_icon="assets/catapult_logo.png",
+    page_icon='assets/catapult_logo.png',  # file path
     layout="wide"
 )
 
@@ -15,9 +18,9 @@ st.set_page_config(
 def load_logo():
     try:
         logo = Image.open('assets/catapult_logo.png')
-        st.sidebar.image(logo, use_column_width=True)
+        st.sidebar.image(logo, width=150)
     except Exception:
-        st.sidebar.markdown("<h3>Catapult CSV Exporter</h3>", unsafe_allow_html=True)
+        st.sidebar.title("Catapult CSV Exporter")
 
 # Inject custom CSS for Catapult styling and dark mode support
 def load_css():
@@ -30,18 +33,17 @@ def load_css():
       .stApp {
         background-color: #F2F4F8;
       }
-      .main-header img {
-        height: 1.5em;
-        vertical-align: middle;
-        margin-right: 0.5em;
-      }
       .main-header {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+      }
+      .main-header-text {
         color: #005EB8;
         font-size: 2.5rem;
         font-weight: 700;
-        text-align: center;
-        margin-top: 1rem;
-        margin-bottom: 0.5rem;
+        margin: 0;
       }
       .sub-header {
         color: #6C757D;
@@ -95,7 +97,7 @@ def load_css():
         .stApp {
           background-color: #0E1117 !important;
         }
-        .main-header, .sub-header {
+        .main-header-text, .sub-header {
           color: #FFFFFF !important;
         }
         .success-message, .info-card {
@@ -132,11 +134,13 @@ def main():
     load_logo()
     load_css()
 
-    # Header with inline logo image
-    st.markdown(
-        '<h1 class="main-header"><img src="assets/catapult_logo.png" alt="Logo">Catapult CSV Exporter</h1>',
-        unsafe_allow_html=True
-    )
+    # Header with inline logo image and text
+    cols = st.columns([1, 6, 1])
+    with cols[1]:
+        logo = Image.open('assets/catapult_logo.png')
+        st.image(logo, width=40, use_column_width=False)
+        st.markdown('<p class="main-header-text">Catapult CSV Exporter</p>', unsafe_allow_html=True)
+
     st.markdown(
         '<p class="sub-header">Export large datasets by automatically splitting URLs into manageable chunks</p>',
         unsafe_allow_html=True
@@ -159,7 +163,7 @@ def main():
 
     if st.button("🚀 Export CSVs"):
         if not url_input or "playerIDs=" not in url_input:
-            st.error("❌ URL must contain 'playerIDs=' parameter")
+            st.error("❌ URL must contain 'playerIDs='' parameter")
             return
 
         urls, total = split_player_ids(url_input.strip(), chunk_size)
@@ -176,9 +180,9 @@ def main():
             st.markdown(f'<div class="info-card">📊 Summary: {total} athletes → {len(urls)} CSVs (up to {chunk_size} each)</div>', unsafe_allow_html=True)
 
             st.subheader("📥 Download All CSVs")
-            cols = st.columns(min(4, len(urls)))
+            cols_dl = st.columns(min(4, len(urls)))
             for i, u in enumerate(urls):
-                with cols[i % 4]:
+                with cols_dl[i % 4]:
                     count = min(chunk_size, total - i*chunk_size)
                     st.markdown(f'<a class="download-link" href="{u}" target="_blank">📥 CSV {i+1}<br>({count} athletes)</a>', unsafe_allow_html=True)
 
