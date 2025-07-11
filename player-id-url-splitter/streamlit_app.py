@@ -18,7 +18,7 @@ st.set_page_config(
 def load_logo():
     try:
         logo = Image.open('assets/catapult_logo.png')
-        st.sidebar.image(logo, width=150)
+        st.sidebar.image(logo, use_container_width=True)
     except Exception:
         st.sidebar.title("Catapult CSV Exporter")
 
@@ -138,7 +138,7 @@ def main():
     cols = st.columns([1, 6, 1])
     with cols[1]:
         logo = Image.open('assets/catapult_logo.png')
-        st.image(logo, width=40, use_column_width=False)
+        st.image(logo, width=40, use_container_width=False)
         st.markdown('<p class="main-header-text">Catapult CSV Exporter</p>', unsafe_allow_html=True)
 
     st.markdown(
