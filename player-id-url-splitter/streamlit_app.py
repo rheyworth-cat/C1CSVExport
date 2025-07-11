@@ -30,18 +30,101 @@ def split_player_ids(url, chunk_size=100):
 
 def main():
     st.set_page_config(
-        page_title="Player ID URL Splitter",
-        page_icon="⚾",
+        page_title="Catapult CSV Exporter",
+        page_icon="⚡",
         layout="wide"
     )
     
-    st.title("⚾ Player ID URL Splitter")
-    st.markdown("This app splits a URL with multiple player IDs into chunks of 500 athletes each for easier CSV export.")
+    # Custom CSS to match Catapult styling
+    st.markdown("""
+    <style>
+    .main {
+        padding-top: 2rem;
+    }
+    .stApp {
+        background-color: #f8f9fa;
+    }
+    .main-header {
+        color: #1a1a1a;
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        text-align: center;
+    }
+    .sub-header {
+        color: #6c757d;
+        font-size: 1.2rem;
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    .export-button {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 1rem 2rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        width: 100%;
+        margin: 1rem 0;
+    }
+    .export-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+    }
+    .url-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin: 1rem 0;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        border-left: 4px solid #667eea;
+    }
+    .url-link {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        text-decoration: none;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        display: inline-block;
+        margin-top: 0.5rem;
+        transition: all 0.3s ease;
+    }
+    .url-link:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        text-decoration: none;
+        color: white;
+    }
+    .success-message {
+        background: linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%);
+        color: white;
+        padding: 1rem;
+        border-radius: 8px;
+        margin: 1rem 0;
+        font-weight: 500;
+    }
+    .info-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 1rem;
+        border-radius: 8px;
+        margin: 1rem 0;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+    
+    st.markdown('<h1 class="main-header">⚡ Catapult CSV Exporter</h1>', unsafe_allow_html=True)
+    st.markdown('<p class="sub-header">Export large datasets by automatically splitting URLs into manageable chunks</p>', unsafe_allow_html=True)
     
     # URL input
-    st.subheader("Enter Your URL")
+    st.subheader("🔗 Enter Your Export URL")
     url_input = st.text_area(
-        "Paste your URL here:",
+        "Paste your Catapult export URL here:",
         height=100,
         placeholder="Enter a URL containing playerIDs parameter..."
     )
@@ -49,14 +132,61 @@ def main():
     # Advanced settings in collapsed section
     with st.expander("⚙️ Advanced Settings"):
         chunk_size = st.number_input(
-            "Athletes per URL:",
+            "Athletes per CSV file:",
             min_value=1,
             max_value=2000,
             value=500,
-            help="Number of athletes to include in each URL chunk"
+            help="Number of athletes to include in each CSV export"
         )
     
-    if st.button("Split URL", type="primary"):
+    # Single Export button that does everything
+    if st.button("🚀 Export CSVs", type="primary", help="Split URL and download all CSV files"):
+        if url_input.strip():
+            # Check if URL contains playerIDs parameter
+            if "playerIDs=" not in url_input:
+                st.error("❌ URL must contain 'playerIDs=' parameter")
+                return
+                
+            # Split the URL
+            urls, total_athletes = split_player_ids(url_input.strip(), chunk_size)
+            
+            if urls and total_athletes:
+                # Show success message
+                st.markdown(f'<div class="success-message">✅ Found {total_athletes} athletes! Creating {len(urls)} CSV exports...</div>', unsafe_allow_html=True)
+                
+                # Create HTML that opens all URLs automatically
+                auto_download_html = f"""
+                <div style="text-align: center; margin: 2rem 0;">
+                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                        <h3 style="margin: 0;">🚀 Auto-Downloading {len(urls)} CSV Files</h3>
+                        <p style="margin: 0.5rem 0 0 0;">Your CSV files are opening automatically. Allow pop-ups if prompted.</p>
+                    </div>
+                </div>
+                <script>
+                function autoDownloadCSVs() {{
+                    const urls = {str(urls).replace("'", '"')};
+                    let openedCount = 0;
+                    
+                    urls.forEach((url, index) => {{
+                        setTimeout(() => {{
+                            window.open(url, '_blank');
+                            openedCount++;
+                            if (openedCount === urls.length) {{
+                                console.log('All CSV exports opened successfully!');
+                            }}
+                        }}, index * 800);
+                    }});
+                }}
+                
+                // Auto-trigger the download
+                setTimeout(autoDownloadCSVs, 1000);
+                </script>
+                """
+                
+                st.components.v1.html(auto_download_html, height=150)
+                
+                # Show summary
+                st.markdown(f'<div class="info-card">📊 <strong>Export Summary:</strong> {total_athletes} athletes split into {len(urls)} CSV files with up to {chunk_size} athletes each</div>', unsafe_allow_html=True)
         if url_input.strip():
             # Check if URL contains playerIDs parameter
             if "playerIDs=" not in url_input:
@@ -130,12 +260,14 @@ def main():
     
     # Example section
     st.markdown("---")
-    st.subheader("📖 Example")
-    st.markdown("**Original URL with 500 athletes:**")
-    st.code("https://example.com/data?playerIDs=player1%2Cplayer2%2C...%2Cplayer500&other=params")
+    st.subheader("📖 Example Usage")
+    st.markdown("**Original Catapult export URL with 1,200 athletes:**")
+    st.code("https://one.catapultsports.com/export?playerIDs=player1%2Cplayer2%2C...%2Cplayer1200&other=params")
     
-    st.markdown("**Will be split into 1 URL (500 athletes each):**")
-    st.code("URL 1: https://example.com/data?playerIDs=player1%2C...%2Cplayer500&other=params")
+    st.markdown("**Will be automatically split into 3 CSV files:**")
+    st.code("CSV 1: Athletes 1-500")
+    st.code("CSV 2: Athletes 501-1000") 
+    st.code("CSV 3: Athletes 1001-1200")
 
 if __name__ == "__main__":
     main()
