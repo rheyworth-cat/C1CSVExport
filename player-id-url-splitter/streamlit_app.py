@@ -152,12 +152,12 @@ def main():
     # User guide
     st.markdown("---")
     st.subheader("📘 User Guide")
-+    st.markdown("**Step 1: Export as Normal:** In your PlayerTek dashboard, click **Export to CSV**. If the download succeeds, you’re done. If nothing happens, proceed to Developer Tools.")
-+    st.markdown("**Step 2: Open Developer Tools:** Press **Ctrl+Shift+I** (Windows/Linux) or **Cmd+Option+I** (Mac) in Chrome. For other browsers like Firefox or Edge, use the equivalent DevTools shortcut.")
-+    st.markdown("[Learn more about Chrome DevTools](https://developer.chrome.com/docs/devtools/)")
-+    st.markdown("**Step 3: Access the Console:** Click the **Console** tab in DevTools and look for errors referencing `ExportService`.")
-+    st.markdown("**Step 4: Identify & Copy URL:** Find the error line containing the URL with `/webinterface/ExportService`. Right-click the link and select **Copy link address**.")
-+    st.markdown("**Step 5: Paste & Export:** Paste the copied URL into the field above and click **🚀 Export CSVs** to split and download your CSV files.")
+    st.markdown("**Step 1: Export as Normal:** In your PlayerTek dashboard, click **Export to CSV**. If the download succeeds, you’re done. If nothing happens, proceed to Developer Tools.")
+    st.markdown("**Step 2: Open Developer Tools:** Press **Ctrl+Shift+I** (Windows/Linux) or **Cmd+Option+I** (Mac) in Chrome. For other browsers like Firefox or Edge, use the equivalent DevTools shortcut.")
+    st.markdown("[Learn more about Chrome DevTools](https://developer.chrome.com/docs/devtools/)")
+    st.markdown("**Step 3: Access the Console:** Click the **Console** tab in DevTools and look for errors referencing `ExportService`.")
+    st.markdown("**Step 4: Identify & Copy URL:** Find the error line containing the URL with `/webinterface/ExportService`. Right-click the link and select **Copy link address**.")
+    st.markdown("**Step 5: Paste & Export:** Paste the copied URL into the field above and click **🚀 Export CSVs** to split and download your CSV files.")
 
 if __name__ == "__main__":
     main()
