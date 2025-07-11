@@ -1,4 +1,5 @@
 import streamlit as st
+import streamlit.components.v1 as components
 import webbrowser
 import urllib.parse
 
@@ -35,7 +36,7 @@ def main():
     )
     
     st.title("⚾ Player ID URL Splitter")
-    st.markdown("This app splits a URL with multiple player IDs into chunks of 100 athletes each for easier CSV export.")
+    st.markdown("This app splits a URL with multiple player IDs into chunks of 500 athletes each for easier CSV export.")
     
     # URL input
     st.subheader("Enter Your URL")
@@ -45,14 +46,15 @@ def main():
         placeholder="Enter a URL containing playerIDs parameter..."
     )
     
-    # Chunk size input
-    chunk_size = st.number_input(
-        "Athletes per URL (default: 100):",
-        min_value=1,
-        max_value=1000,
-        value=100,
-        help="Number of athletes to include in each URL chunk"
-    )
+    # Advanced settings in collapsed section
+    with st.expander("⚙️ Advanced Settings"):
+        chunk_size = st.number_input(
+            "Athletes per URL:",
+            min_value=1,
+            max_value=2000,
+            value=500,
+            help="Number of athletes to include in each URL chunk"
+        )
     
     if st.button("Split URL", type="primary"):
         if url_input.strip():
@@ -70,8 +72,31 @@ def main():
                 # Show summary
                 st.info(f"📊 **Summary:** {total_athletes} athletes split into {len(urls)} chunks of up to {chunk_size} athletes each")
                 
+                # Download All button
+                st.subheader("🚀 Quick Actions")
+                col1, col2 = st.columns([1, 3])
+                
+                with col1:
+                    if st.button("📥 Download All CSVs", type="primary", help="Opens all URLs at once"):
+                        # Create JavaScript to open all URLs
+                        js_code = """
+                        <script>
+                        const urls = """ + str(urls).replace("'", '"') + """;
+                        urls.forEach((url, index) => {
+                            setTimeout(() => {
+                                window.open(url, '_blank');
+                            }, index * 500); // Stagger opening by 500ms to avoid browser blocking
+                        });
+                        </script>
+                        """
+                        st.components.v1.html(js_code, height=0)
+                        st.success(f"🎉 Opening all {len(urls)} URLs! Check for pop-ups if they don't open.")
+                
+                with col2:
+                    st.markdown("**💡 Tip:** The 'Download All' button opens all URLs at once with a small delay between each.")
+                
                 # Display results in a more organized way
-                st.subheader("Generated URLs")
+                st.subheader("Individual URLs")
                 
                 # Create tabs for each URL if there are many
                 if len(urls) <= 5:
@@ -83,9 +108,9 @@ def main():
                             st.markdown(f"**URL {i+1}** ({athletes_in_chunk} athletes)")
                             st.code(url, language=None)
                             
-                            if st.button(f"🔗 Open URL {i+1}", key=f"url_{i}"):
-                                st.markdown(f'<a href="{url}" target="_blank">Click here if the link doesn\'t open automatically</a>', unsafe_allow_html=True)
-                                st.balloons()
+                            # Use HTML link instead of button to prevent page reload
+                            st.markdown(f'<a href="{url}" target="_blank" style="display: inline-block; padding: 0.25rem 0.75rem; background-color: #0066cc; color: white; text-decoration: none; border-radius: 0.25rem; font-size: 0.875rem;">🔗 Open URL {i+1}</a>', unsafe_allow_html=True)
+                            st.markdown("")  # Add spacing
                 else:
                     # Show URLs in expandable sections if more than 5
                     for i, url in enumerate(urls):
@@ -93,9 +118,8 @@ def main():
                         with st.expander(f"URL {i+1} ({athletes_in_chunk} athletes)"):
                             st.code(url, language=None)
                             
-                            if st.button(f"🔗 Open URL {i+1}", key=f"url_{i}"):
-                                st.markdown(f'<a href="{url}" target="_blank">Click here if the link doesn\'t open automatically</a>', unsafe_allow_html=True)
-                                st.balloons()
+                            # Use HTML link instead of button to prevent page reload
+                            st.markdown(f'<a href="{url}" target="_blank" style="display: inline-block; padding: 0.25rem 0.75rem; background-color: #0066cc; color: white; text-decoration: none; border-radius: 0.25rem; font-size: 0.875rem;">🔗 Open URL {i+1}</a>', unsafe_allow_html=True)
                 
                 # Instructions
                 st.markdown("---")
@@ -115,13 +139,11 @@ def main():
     # Example section
     st.markdown("---")
     st.subheader("📖 Example")
-    st.markdown("**Original URL with 250 athletes:**")
-    st.code("https://example.com/data?playerIDs=player1%2Cplayer2%2C...%2Cplayer250&other=params")
+    st.markdown("**Original URL with 500 athletes:**")
+    st.code("https://example.com/data?playerIDs=player1%2Cplayer2%2C...%2Cplayer500&other=params")
     
-    st.markdown("**Will be split into 3 URLs (100 athletes each):**")
-    st.code("URL 1: https://example.com/data?playerIDs=player1%2C...%2Cplayer100&other=params")
-    st.code("URL 2: https://example.com/data?playerIDs=player101%2C...%2Cplayer200&other=params")
-    st.code("URL 3: https://example.com/data?playerIDs=player201%2C...%2Cplayer250&other=params")
+    st.markdown("**Will be split into 1 URL (500 athletes each):**")
+    st.code("URL 1: https://example.com/data?playerIDs=player1%2C...%2Cplayer500&other=params")
 
 if __name__ == "__main__":
     main()
