@@ -85,6 +85,24 @@ def load_css():
       a.download-link:hover {
         opacity: 0.85;
       }
+      /* Dark mode overrides */
+      @media(prefers-color-scheme: dark) {
+        .stApp {
+          background-color: #0E1117 !important;
+        }
+        .main-header, .sub-header {
+          color: #FFFFFF !important;
+        }
+        .success-message, .info-card {
+          filter: brightness(1.2);
+        }
+        button.stButton>button {
+          background-color: #005EB8 !important;
+        }
+        a.download-link {
+          background-color: #FF4B4B !important;
+        }
+      }
     </style>
     """, unsafe_allow_html=True)
 
